@@ -3,9 +3,17 @@ use gpui::{
     prelude::*, px, rgb, size,
 };
 
+#[derive(Debug, Clone, Copy)]
+enum Status {
+    未着手,
+    着手中,
+    待ち,
+    順延,
+    完了,
+}
 struct Item {
     title: SharedString,
-    status: Option<SharedString>,
+    status: Option<Status>,
 }
 struct Group {
     heading: SharedString,
@@ -63,17 +71,24 @@ fn render_item(item: &Item) -> impl IntoElement {
         .justify_between()
         .items_center()
         .child(item.title.clone());
-    match &item.status {
-        Some(s) => row.child(
-            div()
-                .bg(rgb(0xf0a85a))
-                .text_color(rgb(0x111111))
-                .px_2()
-                .rounded_full()
-                .child(s.clone()),
-        ),
-        None => row,
-    }
+
+    let t = match &item.status {
+        Some(Status::未着手) => "未着手",
+        Some(Status::着手中) => "着手中",
+        Some(Status::待ち) => "待ち",
+        Some(Status::順延) => "順延",
+        Some(Status::完了) => "完了",
+        None => "未着手",
+    };
+
+    row.child(
+        div()
+            .bg(rgb(0xf0a85a))
+            .text_color(rgb(0x111111))
+            .px_2()
+            .rounded_full()
+            .child(t),
+    )
 }
 
 fn mock_lanes() -> Vec<Lane> {
@@ -85,14 +100,14 @@ fn mock_lanes() -> Vec<Lane> {
                     heading: "mugenup".into(),
                     items: vec![Item {
                         title: "REDIS調査".into(),
-                        status: Some("待ち".into()),
+                        status: Some(Status::待ち),
                     }],
                 },
                 Group {
                     heading: "社内".into(),
                     items: vec![Item {
                         title: "EOL対応".into(),
-                        status: Some("待ち".into()),
+                        status: Some(Status::待ち),
                     }],
                 },
             ],
