@@ -1,6 +1,6 @@
 use gpui::{
-    App, Application, Bounds, Context, SharedString, Window, WindowBounds, WindowOptions, div,
-    prelude::*, px, rgb, size,
+    App, Application, Bounds, Context, Rgba, SharedString, Window, WindowBounds, WindowOptions,
+    div, prelude::*, px, rgb, size,
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -38,6 +38,28 @@ impl Render for LogodexWindow {
             .gap_3()
             .p_4()
             .children(self.lanes.iter().map(render_lane))
+    }
+}
+
+fn get_bg_color(status: &Option<Status>) -> Rgba {
+    match status {
+        Some(Status::未着手) => rgb(0x3a3a42),
+        Some(Status::着手中) => rgb(0x2d4a6b),
+        Some(Status::待ち) => rgb(0x5c4a2a),
+        Some(Status::順延) => rgb(0x4a3a5c),
+        Some(Status::完了) => rgb(0x2d4a3a),
+        None => rgb(0x3a3a42),
+    }
+}
+
+fn get_text_color(status: &Option<Status>) -> Rgba {
+    match status {
+        Some(Status::未着手) => rgb(0xb0b0b8),
+        Some(Status::着手中) => rgb(0x8fb8e8),
+        Some(Status::待ち) => rgb(0xe8b87a),
+        Some(Status::順延) => rgb(0xc0a0e0),
+        Some(Status::完了) => rgb(0x8fd8a0),
+        None => rgb(0xb0b0b8),
     }
 }
 
@@ -80,7 +102,8 @@ fn render_item(item: &Item) -> impl IntoElement {
         Some(Status::完了) => "完了",
         None => "未着手",
     };
-
+    let bg_color = get_bg_color(&item.status);
+    let text_color = get_text_color(&item.status);
     row.child(
         div()
             .bg(rgb(0xf0a85a))
@@ -98,23 +121,45 @@ fn mock_lanes() -> Vec<Lane> {
             groups: vec![
                 Group {
                     heading: "mugenup".into(),
-                    items: vec![Item {
-                        title: "REDIS調査".into(),
-                        status: Some(Status::待ち),
-                    }],
+                    items: vec![
+                        Item {
+                            title: "REDIS調査".into(),
+                            status: Some(Status::未着手),
+                        },
+                        Item {
+                            title: "EOL対応".into(),
+                            status: Some(Status::着手中),
+                        },
+                    ],
                 },
                 Group {
                     heading: "社内".into(),
-                    items: vec![Item {
-                        title: "EOL対応".into(),
-                        status: Some(Status::待ち),
-                    }],
+                    items: vec![
+                        Item {
+                            title: "反社チェック確認".into(),
+                            status: Some(Status::待ち),
+                        },
+                        Item {
+                            title: "精算処理を追加".into(),
+                            status: Some(Status::順延),
+                        },
+                        Item {
+                            title: "勤怠まとめ".into(),
+                            status: Some(Status::完了),
+                        },
+                    ],
                 },
             ],
         },
         Lane {
             title: "人間管理".into(),
-            groups: vec![],
+            groups: vec![Group {
+                heading: "振り返り・気付き".into(),
+                items: vec![Item {
+                    title: "定例会で報告できた".into(),
+                    status: Some(Status::着手中),
+                }],
+            }],
         },
         Lane {
             title: "シークレット".into(),
