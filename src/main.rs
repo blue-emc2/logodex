@@ -1,6 +1,6 @@
 use gpui::{
-    App, Application, Bounds, Context, Rgba, SharedString, Window, WindowBounds, WindowOptions,
-    div, prelude::*, px, rgb, size,
+    App, Application, Bounds, Context, FontWeight, Rgba, SharedString, Window, WindowBounds,
+    WindowOptions, div, prelude::*, px, rgb, size,
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -43,29 +43,19 @@ impl Render for LogodexWindow {
 
 fn get_bg_color(status: &Option<Status>) -> Rgba {
     match status {
-        Some(Status::未着手) => rgb(0x3a3a42),
-        Some(Status::着手中) => rgb(0x2d4a6b),
-        Some(Status::待ち) => rgb(0x5c4a2a),
-        Some(Status::順延) => rgb(0x4a3a5c),
-        Some(Status::完了) => rgb(0x2d4a3a),
-        None => rgb(0x3a3a42),
-    }
-}
-
-fn get_text_color(status: &Option<Status>) -> Rgba {
-    match status {
-        Some(Status::未着手) => rgb(0xb0b0b8),
-        Some(Status::着手中) => rgb(0x8fb8e8),
-        Some(Status::待ち) => rgb(0xe8b87a),
-        Some(Status::順延) => rgb(0xc0a0e0),
-        Some(Status::完了) => rgb(0x8fd8a0),
-        None => rgb(0xb0b0b8),
+        Some(Status::未着手) => rgb(0xaaaaaa),
+        Some(Status::着手中) => rgb(0x5aa6f0),
+        Some(Status::待ち) => rgb(0xf0a85a),
+        Some(Status::順延) => rgb(0xb79af0),
+        Some(Status::完了) => rgb(0x6cd07a),
+        None => rgb(0xaaaaaa),
     }
 }
 
 fn render_lane(lane: &Lane) -> impl IntoElement {
     div()
         .flex_1()
+        .bg(rgb(0x2f2f33))
         .border_1()
         .border_color(rgb(0x444444))
         .rounded_md()
@@ -73,7 +63,13 @@ fn render_lane(lane: &Lane) -> impl IntoElement {
         .flex()
         .flex_col()
         .gap_2()
-        .child(div().text_lg().child(lane.title.clone()))
+        .child(
+            div()
+                .text_lg()
+                .font_weight(FontWeight::BOLD)
+                .text_color(rgb(0xffffff))
+                .child(lane.title.clone()),
+        )
         .children(lane.groups.iter().map(render_group))
 }
 
@@ -82,7 +78,7 @@ fn render_group(group: &Group) -> impl IntoElement {
         .flex()
         .flex_col()
         .gap_1()
-        .child(div().text_color(rgb(0x9aaaff)).child(group.heading.clone()))
+        .child(div().text_color(rgb(0x99aaff)).child(group.heading.clone()))
         .children(group.items.iter().map(render_item))
 }
 
@@ -90,6 +86,7 @@ fn render_item(item: &Item) -> impl IntoElement {
     let row = div()
         .flex()
         .flex_row()
+        .bg(rgb(0x383840))
         .justify_between()
         .items_center()
         .child(item.title.clone());
@@ -103,10 +100,9 @@ fn render_item(item: &Item) -> impl IntoElement {
         None => "未着手",
     };
     let bg_color = get_bg_color(&item.status);
-    let text_color = get_text_color(&item.status);
     row.child(
         div()
-            .bg(rgb(0xf0a85a))
+            .bg(bg_color)
             .text_color(rgb(0x111111))
             .px_2()
             .rounded_full()
