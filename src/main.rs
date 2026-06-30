@@ -58,7 +58,7 @@ fn render_lane(lane: &Lane) -> impl IntoElement {
         .border_1()
         .border_color(rgb(0x444444))
         .rounded_md()
-        .p_4()
+        .p_3()
         .flex()
         .flex_col()
         .gap_2()
@@ -77,7 +77,12 @@ fn render_group(group: &Group) -> impl IntoElement {
         .flex()
         .flex_col()
         .gap_1()
-        .child(div().text_color(rgb(0x99aaff)).child(group.heading.clone()))
+        .child(
+            div()
+                .text_sm()
+                .text_color(rgb(0x99aaff))
+                .child(group.heading.clone()),
+        )
         .children(group.items.iter().map(render_item))
 }
 
@@ -86,6 +91,10 @@ fn render_item(item: &Item) -> impl IntoElement {
         .flex()
         .flex_row()
         .bg(rgb(0x383840))
+        .rounded_md()
+        .px_2()
+        .py_1p5()
+        .text_sm()
         .justify_between()
         .items_center()
         .child(item.title.clone());
@@ -105,7 +114,9 @@ fn render_item(item: &Item) -> impl IntoElement {
                 div()
                     .bg(get_bg_color(s))
                     .text_color(rgb(0x111111))
+                    .text_xs()
                     .px_2()
+                    .py_0p5()
                     .rounded_full()
                     .child(t),
             )
