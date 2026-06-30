@@ -41,14 +41,13 @@ impl Render for LogodexWindow {
     }
 }
 
-fn get_bg_color(status: &Option<Status>) -> Rgba {
+fn get_bg_color(status: &Status) -> Rgba {
     match status {
-        Some(Status::未着手) => rgb(0xaaaaaa),
-        Some(Status::着手中) => rgb(0x5aa6f0),
-        Some(Status::待ち) => rgb(0xf0a85a),
-        Some(Status::順延) => rgb(0xb79af0),
-        Some(Status::完了) => rgb(0x6cd07a),
-        None => rgb(0xaaaaaa),
+        Status::未着手 => rgb(0xaaaaaa),
+        Status::着手中 => rgb(0x5aa6f0),
+        Status::待ち => rgb(0xf0a85a),
+        Status::順延 => rgb(0xb79af0),
+        Status::完了 => rgb(0x6cd07a),
     }
 }
 
@@ -91,23 +90,27 @@ fn render_item(item: &Item) -> impl IntoElement {
         .items_center()
         .child(item.title.clone());
 
-    let t = match &item.status {
-        Some(Status::未着手) => "未着手",
-        Some(Status::着手中) => "着手中",
-        Some(Status::待ち) => "待ち",
-        Some(Status::順延) => "順延",
-        Some(Status::完了) => "完了",
-        None => "未着手",
-    };
-    let bg_color = get_bg_color(&item.status);
-    row.child(
-        div()
-            .bg(bg_color)
-            .text_color(rgb(0x111111))
-            .px_2()
-            .rounded_full()
-            .child(t),
-    )
+    match &item.status {
+        None => row,
+        Some(s) => {
+            let t = match s {
+                Status::未着手 => "未着手",
+                Status::着手中 => "着手中",
+                Status::待ち => "待ち",
+                Status::順延 => "順延",
+                Status::完了 => "完了",
+            };
+
+            row.child(
+                div()
+                    .bg(get_bg_color(s))
+                    .text_color(rgb(0x111111))
+                    .px_2()
+                    .rounded_full()
+                    .child(t),
+            )
+        }
+    }
 }
 
 fn mock_lanes() -> Vec<Lane> {
